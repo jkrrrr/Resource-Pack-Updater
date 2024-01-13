@@ -6,7 +6,7 @@ from os.path import isfile, join
 import sys
 import json
 
-# Dictionary of versions
+# Dictionary of versions - update when needed
 versions = {
     1 : "1.6.1",
     2 : "1.9",
@@ -89,6 +89,12 @@ def main():
     name = input("Input name of resource pack:\n")
     version = input("Input new version:\n")
 
+    # Test for valid version
+    if not version in versions.values():
+        print("Invalid version.\nCheck the list of formats at https://minecraft.wiki/w/Pack_format")
+        sys.exit()
+
+    # To do all packs
     if name == "all":
         # Get only get only .zips, and remove the .zip
         dirFiles = [file[:-4] for file in listdir(currentDir) if isfile(join(currentDir, file)) and file.endswith('.zip')]
@@ -98,7 +104,7 @@ def main():
                 update(pack, version)
             except:
                 print("Unable to process " + pack)
-    else:
+    else: # Single pack
         update(name, version)
 
     print("Complete!")
