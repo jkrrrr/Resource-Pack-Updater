@@ -94,7 +94,10 @@ def main():
         dirFiles = [file[:-4] for file in listdir(currentDir) if isfile(join(currentDir, file)) and file.endswith('.zip')]
         # Update each one
         for pack in dirFiles:
-            update(pack, version)
+            try:
+                update(pack, version)
+            except:
+                print("Unable to process " + pack)
     else:
         update(name, version)
 
