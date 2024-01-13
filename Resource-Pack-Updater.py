@@ -6,7 +6,7 @@ from os.path import isfile, join
 import sys
 import json
 
-
+# Dictionary of versions
 versions = {
     1 : "1.6.1",
     2 : "1.9",
@@ -27,32 +27,52 @@ versions = {
     18 : "1.20.2"
 }
 
+# Current working directory
 currentDir = os.getcwd()
 
 def get_key_by_value(value):
+    """
+    Retrieves the key for a given value
+
+    :param value: The value of the key to retrieve
+    :type value: str
+    """
     for key, val in versions.items():
         if val == value:
             return key
     return None
 
 def update(pack, version):
+    """
+    Updates the version of a resource pack
+
+    :param pack: The name of the resource pack to update
+    :type pack: str
+
+    :param version: The version to replace it with
+    :type  version: str
+    """
     print("Processing resource pack " + pack + " to version " + version)
     packPath_zip = os.path.join(currentDir, pack + ".zip")
     packPath = os.path.join(currentDir, pack)
 
+    # Check if pack exists
     if not os.path.exists(packPath_zip):
         print("Resource pack does not exist!")
         sys.exit()
 
+    # Extract pack
     with zipfile.ZipFile(packPath_zip, 'r') as zip_ref:
         zip_ref.extractall(packPath)
         
+    # Open file and load JSON
     targetPath = os.path.join(currentDir, pack, "pack.mcmeta")
     file = open(targetPath)
     data = json.load(file)
 
     print("Current version is " + versions.get(data["pack"]["pack_format"]))
 
+    # Update the version
     with open(os.path.join(packPath, "pack.mcmeta"), 'w') as file:
         data["pack"]["pack_format"] = get_key_by_value(version)
 
@@ -61,6 +81,7 @@ def update(pack, version):
 
     file.close()
 
+    # Repack as new zip
     shutil.make_archive(pack, 'zip', packPath)
     shutil.rmtree(packPath)
 
@@ -69,7 +90,9 @@ def main():
     version = input("Input new version:\n")
 
     if name == "all":
+        # Get only get only .zips, and remove the .zip
         dirFiles = [file[:-4] for file in listdir(currentDir) if isfile(join(currentDir, file)) and file.endswith('.zip')]
+        # Update each one
         for pack in dirFiles:
             update(pack, version)
     else:
