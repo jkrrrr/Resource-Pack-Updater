@@ -92,6 +92,7 @@ def main():
     # Get only get only .zips, and remove the .zip
     dirFiles = [file[:-4] for file in listdir(currentDir) if isfile(join(currentDir, file)) and file.endswith('.zip')]
     completers = dirFiles
+    completers.extend("all")
     completer = WordCompleter(completers)
     session = PromptSession(completer=completer)
 
