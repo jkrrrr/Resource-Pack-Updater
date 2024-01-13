@@ -34,12 +34,15 @@ def main():
     currentDir = os.getcwd()
     name = input("Input name of resource pack:\n")
 
+    packPath_zip = os.path.join(currentDir, name + ".zip")
+    packPath = os.path.join(currentDir, name)
 
-    with zipfile.ZipFile(currentDir+"\\"+name+".zip", 'r') as zip_ref:
+    with zipfile.ZipFile(packPath_zip, 'r') as zip_ref:
         print("Extracting zip...")
-        zip_ref.extractall(currentDir+"\\"+name)
+        zip_ref.extractall(packPath)
         
-    file = open(currentDir+"\\"+name+"\\pack.mcmeta")
+    targetPath = os.path.join(currentDir, name, "pack.mcmeta")
+    file = open(targetPath)
     data = json.load(file)
 
     print("Current version is " + versions.get(data["pack"]["pack_format"]))
@@ -55,10 +58,10 @@ def main():
     file.close
 
     print("Creating zip...")
-    shutil.make_archive(name, 'zip', currentDir+"\\"+name)
+    shutil.make_archive(name, 'zip', packPath_zip)
 
     print("Removing directory...")
-    shutil.rmtree(currentDir+"\\"+name)
+    shutil.rmtree(packPath)
 
     print("Successfully updated!")
 
