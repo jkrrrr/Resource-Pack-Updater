@@ -1,6 +1,7 @@
 import zipfile
 import shutil
 import os
+import sys
 import json
 
 
@@ -36,6 +37,10 @@ def main():
 
     packPath_zip = os.path.join(currentDir, name + ".zip")
     packPath = os.path.join(currentDir, name)
+
+    if not os.path.exists(packPath_zip):
+        print("Resource pack does not exist!")
+        sys.exit()
 
     with zipfile.ZipFile(packPath_zip, 'r') as zip_ref:
         print("Extracting zip...")
