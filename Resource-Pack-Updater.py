@@ -6,6 +6,9 @@ from os.path import isfile, join
 import sys
 import json
 
+from prompt_toolkit import PromptSession
+from prompt_toolkit.completion import WordCompleter
+
 # Dictionary of versions - update when needed
 versions = {
     1 : "1.6.1",
@@ -86,8 +89,14 @@ def update(pack, version):
     shutil.rmtree(packPath)
 
 def main():
-    name = input("Input name of resource pack:\n")
-    version = input("Input new version:\n")
+    # Get only get only .zips, and remove the .zip
+    dirFiles = [file[:-4] for file in listdir(currentDir) if isfile(join(currentDir, file)) and file.endswith('.zip')]
+    completers = dirFiles
+    completer = WordCompleter(completers)
+    session = PromptSession(completer=completer)
+
+    name = session.prompt("Input name of resource pack:\n")
+    version = session.prompt("Input new version:\n")
 
     # Test for valid version
     if not version in versions.values():
@@ -96,8 +105,6 @@ def main():
 
     # To do all packs
     if name == "all":
-        # Get only get only .zips, and remove the .zip
-        dirFiles = [file[:-4] for file in listdir(currentDir) if isfile(join(currentDir, file)) and file.endswith('.zip')]
         # Update each one
         for pack in dirFiles:
             try:
