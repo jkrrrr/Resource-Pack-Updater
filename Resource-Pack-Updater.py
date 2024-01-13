@@ -1,6 +1,8 @@
 import zipfile
 import shutil
 import os
+from os import listdir
+from os.path import isfile, join
 import sys
 import json
 
@@ -25,50 +27,55 @@ versions = {
     18 : "1.20.2"
 }
 
+currentDir = os.getcwd()
+
 def get_key_by_value(value):
     for key, val in versions.items():
         if val == value:
             return key
     return None
 
-def main():
-    currentDir = os.getcwd()
-    name = input("Input name of resource pack:\n")
-
-    packPath_zip = os.path.join(currentDir, name + ".zip")
-    packPath = os.path.join(currentDir, name)
+def update(pack, version):
+    print("Processing resource pack " + pack + " to version " + version)
+    packPath_zip = os.path.join(currentDir, pack + ".zip")
+    packPath = os.path.join(currentDir, pack)
 
     if not os.path.exists(packPath_zip):
         print("Resource pack does not exist!")
         sys.exit()
 
     with zipfile.ZipFile(packPath_zip, 'r') as zip_ref:
-        print("Extracting zip...")
         zip_ref.extractall(packPath)
         
-    targetPath = os.path.join(currentDir, name, "pack.mcmeta")
+    targetPath = os.path.join(currentDir, pack, "pack.mcmeta")
     file = open(targetPath)
     data = json.load(file)
 
     print("Current version is " + versions.get(data["pack"]["pack_format"]))
 
-    with open(currentDir+"\\"+name+"\\pack.mcmeta", 'w') as file:
-        new = input("Input new version:\n")
-        print("Updating value")
-        data["pack"]["pack_format"] = get_key_by_value(new)
+    with open(os.path.join(packPath, "pack.mcmeta"), 'w') as file:
+        data["pack"]["pack_format"] = get_key_by_value(version)
 
         file.seek(0)
         json.dump(data, file, indent=4)
 
-    file.close
+    file.close()
 
-    print("Creating zip...")
-    shutil.make_archive(name, 'zip', packPath_zip)
-
-    print("Removing directory...")
+    shutil.make_archive(pack, 'zip', packPath)
     shutil.rmtree(packPath)
 
-    print("Successfully updated!")
+def main():
+    name = input("Input name of resource pack:\n")
+    version = input("Input new version:\n")
+
+    if name == "all":
+        dirFiles = [file[:-4] for file in listdir(currentDir) if isfile(join(currentDir, file)) and file.endswith('.zip')]
+        for pack in dirFiles:
+            update(pack, version)
+    else:
+        update(name, version)
+
+    print("Complete!")
 
 
 main()
