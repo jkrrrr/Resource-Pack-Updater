@@ -24,10 +24,15 @@ versions = {
     12 : "1.19.3",
     13 : "1.19.4",
     14 : "23w14a",
-    15 : "23w17a",
+    15 : "1.20",
     16 : "23w31a",
     17 : "23w32a",
-    18 : "1.20.2"
+    18 : "1.20.2",
+    19 : "23w42a",
+    20 : "23w43a",
+    21 : "23w45a",
+    22 : "1.20.3",
+    24 : "24w03a"
 }
 
 # Current working directory
@@ -92,6 +97,7 @@ def main():
     # Get only get only .zips, and remove the .zip
     dirFiles = [file[:-4] for file in listdir(currentDir) if isfile(join(currentDir, file)) and file.endswith('.zip')]
     completers = dirFiles
+    completers.extend("all")
     completer = WordCompleter(completers)
     session = PromptSession(completer=completer)
 
